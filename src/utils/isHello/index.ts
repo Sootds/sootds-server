@@ -1,0 +1,1 @@
+export { isHello } from './isHello';
