@@ -1,29 +1,17 @@
-import express, { Request, Response } from 'express';
-import { isHello } from './utils';
+import express from 'express';
+import cors from 'cors';
+import { apiRoute, apiRouter } from './routes'
 
 const server = express();
-const port = 3000;
+const port = 4000;
 
 // Setup middleware.
+server.use(cors());
 server.use(express.urlencoded({ extended: true }));
 server.use(express.json());
 
-server.get('/', (request: Request, response: Response): void => {
-  response.send('GET - Hello!');
-});
-
-server.post('/', (request: Request, response: Response): void => {
-  const { message } = request.body;
-  if (isHello(message)) {
-    response.json({
-      message: `POST - You said "Hello". 😂`,
-    });
-  } else {
-    response.json({
-      message: `POST - You said "${message}"`,
-    });
-  }
-});
+// Setup API router.
+server.use(apiRoute, apiRouter);
 
 server.listen(port, (): void => {
   console.log(`Server listening at http://localhost:${port}`);
