@@ -1,5 +1,10 @@
 import { Router, Request, Response } from 'express';
-import { CognitoUserPool, CognitoUserAttribute, CognitoUser } from 'amazon-cognito-identity-js';
+import {
+  CognitoUserPool,
+  CognitoUserAttribute,
+  CognitoUser,
+  ISignUpResult
+} from 'amazon-cognito-identity-js';
 import { SignUpRequestType, ConfirmAccountRequestType } from './types';
 import { SignUpRequestSchema, ConfirmAccountRequestSchema } from './schemas';
 import { validateRequestSchema } from '../../middlewares';
@@ -13,7 +18,7 @@ const userPool = new CognitoUserPool({
   ClientId: process.env.AWS_COGNITO_CLIENT_ID
 });
 
-authRouter.get('/ping', (request: Request, response: Response): void => {
+authRouter.get('/ping', (_: Request, response: Response): void => {
   response.send('pong');
 });
 
@@ -31,12 +36,19 @@ authRouter.post(
     });
     attributeList.push(attributeEmail);
 
-    userPool.signUp(user.user_name, user.password, attributeList, null, (err, result) => {
-      if (err) {
-        response.json({ message: err.message, error: JSON.stringify(err) });
+    userPool.signUp(
+      user.user_name,
+      user.password,
+      attributeList,
+      null,
+      (error: Error, _: ISignUpResult) => {
+        if (error.name == 'UsernameExistsException') {
+          response.status(409).json({ error: 'Account already exists.' });
+        } else {
+          response.status(200).json({ message: 'Account created.' });
+        }
       }
-      response.json({ user_name: result.user.getUsername() });
-    });
+    );
   }
 );
 
@@ -52,11 +64,20 @@ authRouter.post(
       Pool: userPool
     });
 
-    cognitoUser.confirmRegistration(user.confirmation_code, true, (err, result) => {
-      if (err) {
-        response.json({ message: err.message, error: JSON.stringify(err) });
+    cognitoUser.confirmRegistration(
+      user.confirmation_code,
+      true,
+      (error: Error, result: ISignUpResult) => {
+        if (error.name == 'ExpiredCodeException') {
+          response.status(410).json({ message: 'Confirmation code has expired.' });
+        } else if (error.name == 'NotAuthorizedException') {
+          response.status(401).json({ message: 'Account is not authorized.' });
+        } else if (error.name == 'CodeMismatchException') {
+          response.status(400).json({ message: 'Confirmation code is invalid.' });
+        } else {
+          response.status(200).json({ message: 'Account email confirmed.' });
+        }
       }
-      response.json({ message: JSON.stringify(result) });
-    });
+    );
   }
 );
