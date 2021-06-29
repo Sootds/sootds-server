@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { CognitoUserPool, CognitoUserAttribute, CognitoUser } from 'amazon-cognito-identity-js';
-import type { UserSignUpRequest, UserConfirmAccountRequest } from './types';
+import type { SignUpRequestType, ConfirmAccountRequestType } from './types';
 
 export const authRoute = '/auth';
 export const authRouter = Router();
@@ -17,7 +17,7 @@ authRouter.get('/ping', (request: Request, response: Response): void => {
 
 // Sign Up
 authRouter.post('/signup', (request: Request, response: Response): void => {
-  const user: UserSignUpRequest = request.body;
+  const user: SignUpRequestType = request.body;
 
   const attributeList = [];
   const attributeEmail = new CognitoUserAttribute({
@@ -36,7 +36,7 @@ authRouter.post('/signup', (request: Request, response: Response): void => {
 
 // Confirm Account
 authRouter.post('/confirm-account', (request: Request, response: Response): void => {
-  const user: UserConfirmAccountRequest = request.body;
+  const user: ConfirmAccountRequestType = request.body;
 
   const cognitoUser = new CognitoUser({
     Username: user.user_name,
