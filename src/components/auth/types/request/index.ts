@@ -1,2 +1,2 @@
-export * from './SignUpRequest';
-export * from './ConfirmAccountRequest';
+export * from './SignUpRequestType';
+export * from './ConfirmAccountRequestType';
