@@ -1,7 +1,8 @@
 import express from 'express';
 import cors from 'cors';
-import { apiRoute, apiRouter } from './routes'
+import { apiRoute, apiRouter } from './routes';
 
+// Create Express server.
 const server = express();
 const port = 4000;
 
