@@ -8,3 +8,6 @@ certs/**/*
 *.key
 *.mobileprovision
 *.orig.*
+
+.env*
+

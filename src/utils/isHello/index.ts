@@ -1,1 +1,0 @@
-export { isHello } from './isHello';

@@ -67,7 +67,7 @@ authRouter.post(
     cognitoUser.confirmRegistration(
       user.confirmation_code,
       true,
-      (error: Error, result: ISignUpResult) => {
+      (error: Error, _: ISignUpResult) => {
         if (error.name == 'ExpiredCodeException') {
           response.status(410).json({ message: 'Confirmation code has expired.' });
         } else if (error.name == 'NotAuthorizedException') {
