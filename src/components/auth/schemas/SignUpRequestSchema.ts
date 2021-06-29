@@ -29,8 +29,10 @@ export const SignUpRequestSchema = Joi.object().keys({
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[\^$*.\[\]{}\(\)?\-“!@#%&\/,><\’:;|_~`])\S{8,99}$/
       )
     )
+    .required()
     .messages({
       'string.pattern.base':
-        '`password` length must be 8 or greater and must contain a number, a special character, an uppercase and lowercase letter.'
+        '`password` length must be 8 or greater and must contain a number, a special character, an uppercase and lowercase letter.',
+      'any.required': '`password` is required.'
     })
 });
