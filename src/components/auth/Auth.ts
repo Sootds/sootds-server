@@ -11,7 +11,7 @@ import {
 import AWS from 'aws-sdk/global';
 
 // SHARED IMPORTS
-import { validateRequestSchema } from '../../shared/middlewares';
+import { validateRequestSchema, enableCredentials } from '../../shared/middlewares';
 
 // LOCAL IMPORTS
 import { SignUpRequestType, VerifyAccountRequestType, SignInRequestType } from './types';
@@ -98,7 +98,7 @@ authRouter.post(
 // Sign In
 authRouter.post(
   '/signin',
-  validateRequestSchema(SignInRequestSchema),
+  [validateRequestSchema(SignInRequestSchema), enableCredentials],
   (request: Request, response: Response): void => {
     const user: SignInRequestType = request.body;
 
