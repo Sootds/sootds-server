@@ -14,8 +14,8 @@ import AWS from 'aws-sdk/global';
 import { validateRequestSchema } from '../../shared/middlewares';
 
 // LOCAL IMPORTS
-import { SignUpRequestType, ConfirmAccountRequestType, SignInRequestType } from './types';
-import { SignUpRequestSchema, ConfirmAccountRequestSchema, SignInRequestSchema } from './schemas';
+import { SignUpRequestType, VerifyAccountRequestType, SignInRequestType } from './types';
+import { SignUpRequestSchema, VerifyAccountRequestSchema, SignInRequestSchema } from './schemas';
 
 // Setup component router.
 export const authRoute = '/auth';
@@ -65,12 +65,12 @@ authRouter.post(
   }
 );
 
-// Confirm Account
+// Verify Account
 authRouter.post(
-  '/confirm-account',
-  validateRequestSchema(ConfirmAccountRequestSchema),
+  '/verify-account',
+  validateRequestSchema(VerifyAccountRequestSchema),
   (request: Request, response: Response): void => {
-    const user: ConfirmAccountRequestType = request.body;
+    const user: VerifyAccountRequestType = request.body;
 
     const cognitoUser = new CognitoUser({
       Username: user.user_name,
@@ -115,6 +115,10 @@ authRouter.post(
     cognitoUser.authenticateUser(authenticationDetails, {
       onSuccess: (result: CognitoUserSession): void => {
         const accessToken = result.getAccessToken();
+        response.cookie('access_token', accessToken.getJwtToken(), {
+          httpOnly: true,
+          maxAge: accessToken.getExpiration()
+        });
         response.status(200).json({
           message: 'Sign in successful.',
           access_token: accessToken.getJwtToken(),
