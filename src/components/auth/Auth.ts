@@ -11,7 +11,7 @@ import {
 import AWS from 'aws-sdk/global';
 
 // SHARED IMPORTS
-import { validateRequestSchema, enableCredentials } from '../../shared/middlewares';
+import { validateRequestSchema } from '../../shared/middlewares';
 
 // LOCAL IMPORTS
 import { SignUpRequestType, VerifyAccountRequestType, SignInRequestType } from './types';
@@ -98,7 +98,7 @@ authRouter.post(
 // Sign In
 authRouter.post(
   '/signin',
-  [validateRequestSchema(SignInRequestSchema), enableCredentials],
+  validateRequestSchema(SignInRequestSchema),
   (request: Request, response: Response): void => {
     const user: SignInRequestType = request.body;
 
@@ -115,16 +115,10 @@ authRouter.post(
     cognitoUser.authenticateUser(authenticationDetails, {
       onSuccess: (result: CognitoUserSession): void => {
         const accessToken = result.getAccessToken();
-        response.cookie('access_token', accessToken.getJwtToken(), {
-          httpOnly: true,
+        response.cookie('__access_token', accessToken.getJwtToken(), {
           maxAge: accessToken.getExpiration()
         });
-        response.status(200).json({
-          message: 'Sign in successful.',
-          access_token: accessToken.getJwtToken(),
-          expires_in: accessToken.getExpiration(),
-          token_type: 'Bearer'
-        });
+        response.status(200).json({ message: 'Sign in successful.' });
       },
       onFailure: (error: Error): void => {
         if (error.name == 'NotAuthorizedException') {
