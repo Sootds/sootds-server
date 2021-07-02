@@ -1,5 +1,8 @@
+// EXTERNAL IMPORTS
 import express from 'express';
 import cors from 'cors';
+
+// LOCAL IMPORTS
 import { apiRoute, apiRouter } from './routes';
 
 // Create Express server.

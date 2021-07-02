@@ -1,3 +1,4 @@
+// EXTERNAL IMPORTS
 import Joi from 'joi';
 
 export const VerifyAccountRequestSchema = Joi.object().keys({

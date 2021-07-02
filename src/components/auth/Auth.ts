@@ -32,7 +32,7 @@ const userPool = new CognitoUserPool({
 
 // Ping
 authRouter.get('/ping', (_: Request, response: Response): void => {
-  response.send('pong');
+  response.status(200).json({ message: 'pong' });
 });
 
 // Sign Up
