@@ -42,21 +42,35 @@ authRouter.post(
   (request: Request, response: Response): void => {
     const user: SignUpRequestType = request.body;
 
-    const attributeList = [];
-    const attributeEmail = new CognitoUserAttribute({
-      Name: 'email',
-      Value: user.email
-    });
-    attributeList.push(attributeEmail);
+    const attributeList = [
+      new CognitoUserAttribute({
+        Name: 'name',
+        Value: user.name
+      }),
+      new CognitoUserAttribute({
+        Name: 'email',
+        Value: user.email
+      }),
+      new CognitoUserAttribute({
+        Name: 'updated_at',
+        Value: Date.now().toString()
+      })
+    ];
 
     userPool.signUp(
-      user.user_name,
+      user.username,
       user.password,
       attributeList,
       null,
       (error: Error, _: ISignUpResult): void => {
-        if (error.name == 'UsernameExistsException') {
-          response.status(409).json({ error: 'Account already exists.' });
+        if (error != null) {
+          switch (error.name) {
+            case 'UsernameExistsException':
+              response.status(409).json({ message: 'Account already exists.' });
+              break;
+            default:
+              break;
+          }
         } else {
           response.status(200).json({ message: 'Account created.' });
         }
@@ -73,7 +87,7 @@ authRouter.post(
     const user: VerifyAccountRequestType = request.body;
 
     const cognitoUser = new CognitoUser({
-      Username: user.user_name,
+      Username: user.username,
       Pool: userPool
     });
 
@@ -81,14 +95,22 @@ authRouter.post(
       user.confirmation_code,
       true,
       (error: Error, _: ISignUpResult): void => {
-        if (error.name == 'ExpiredCodeException') {
-          response.status(410).json({ message: 'Confirmation code has expired.' });
-        } else if (error.name == 'NotAuthorizedException') {
-          response.status(401).json({ message: 'Account is not authorized.' });
-        } else if (error.name == 'CodeMismatchException') {
-          response.status(400).json({ message: 'Confirmation code is invalid.' });
+        if (error != null) {
+          switch (error.name) {
+            case 'ExpiredCodeException':
+              response.status(410).json({ message: 'Confirmation code has expired.' });
+              break;
+            case 'CodeMismatchException':
+              response.status(400).json({ message: 'Confirmation code is invalid.' });
+              break;
+            case 'NotAuthorizedException':
+              response.status(401).json({ message: 'Account is not authorized.' });
+              break;
+            default:
+              break;
+          }
         } else {
-          response.status(200).json({ message: 'Account email confirmed.' });
+          response.status(200).json({ message: 'Account verified.' });
         }
       }
     );
@@ -103,28 +125,32 @@ authRouter.post(
     const user: SignInRequestType = request.body;
 
     const cognitoUser = new CognitoUser({
-      Username: user.user_name,
+      Username: user.username,
       Pool: userPool
     });
 
     const authenticationDetails = new AuthenticationDetails({
-      Username: user.user_name,
+      Username: user.username,
       Password: user.password
     });
 
     cognitoUser.authenticateUser(authenticationDetails, {
-      onSuccess: (result: CognitoUserSession): void => {
-        const accessToken = result.getAccessToken();
-        response.cookie('__access_token', accessToken.getJwtToken(), {
-          maxAge: accessToken.getExpiration()
+      onSuccess: (session: CognitoUserSession): void => {
+        response.status(200).json({
+          message: 'Sign in successful.',
+          id_token: session.getIdToken().getJwtToken(),
+          acccess_token: session.getAccessToken().getJwtToken(),
+          refresh_token: session.getRefreshToken().getToken()
         });
-        response.status(200).json({ message: 'Sign in successful.' });
       },
       onFailure: (error: Error): void => {
-        if (error.name == 'NotAuthorizedException') {
-          response.status(401).json({ message: 'Incorrect username or password.' });
-        } else {
-          response.status(500).json({ message: 'Uh-oh. Server error.' });
+        switch (error.name) {
+          case 'NotAuthorizedException':
+            response.status(401).json({ message: 'Incorrect username or password.' });
+            break;
+          default:
+            response.status(500).json({ message: 'Uh-oh. Server error.' });
+            break;
         }
       }
     });
