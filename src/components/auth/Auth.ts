@@ -136,11 +136,14 @@ authRouter.post(
 
     cognitoUser.authenticateUser(authenticationDetails, {
       onSuccess: (session: CognitoUserSession): void => {
+        response.cookie('refresh_token', session.getRefreshToken().getToken(), {
+          httpOnly: true,
+          secure: false
+        });
         response.status(200).json({
           message: 'Sign in successful.',
           id_token: session.getIdToken().getJwtToken(),
-          acccess_token: session.getAccessToken().getJwtToken(),
-          refresh_token: session.getRefreshToken().getToken()
+          access_token: session.getAccessToken().getJwtToken()
         });
       },
       onFailure: (error: Error): void => {
