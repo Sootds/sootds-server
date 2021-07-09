@@ -24,13 +24,16 @@ import {
   SignInRequestBodyType,
   RefreshTokenRequestBodyType,
   RefreshTokenRequestCookieType,
-  IdTokenDecodedType
+  IdTokenDecodedType,
+  SignOutRequestBodyType,
+  SignOutRequestCookieType
 } from './types';
 import {
   SignUpRequestBodySchema,
   VerifyAccountRequestBodySchema,
   SignInRequestBodySchema,
-  RefreshTokenRequestBodySchema
+  RefreshTokenRequestBodySchema,
+  SignOutRequestBodySchema
 } from './schemas';
 
 // Setup component router.
@@ -193,6 +196,35 @@ authRouter.post(
     // TO DO: Implement proper token validation and refresh.
     if (session.isValid()) {
       response.status(200).json({ message: 'Tokens are valid.' });
+    } else {
+      response.status(401).json({ message: 'Tokens are invalid.' });
+    }
+  }
+);
+
+// Sign Out
+authRouter.post(
+  '/signout',
+  validateRequestSchema(SignOutRequestBodySchema),
+  (request: Request, response: Response): void => {
+    const tokens: SignOutRequestBodyType = request.body;
+    const cookies: SignOutRequestCookieType = request.cookies;
+
+    const session = new CognitoUserSession({
+      IdToken: new CognitoIdToken({ IdToken: tokens.id_token }),
+      AccessToken: new CognitoAccessToken({ AccessToken: tokens.access_token }),
+      RefreshToken: new CognitoRefreshToken({ RefreshToken: cookies.refresh_token })
+    });
+
+    // TO DO: Track the issue regarding `.signOut()` not revoking tokens.
+    if (session.isValid()) {
+      const idTokenDecodedType: IdTokenDecodedType = jwtDecode(tokens.id_token);
+      const cognitoUser = new CognitoUser({
+        Username: idTokenDecodedType['cognito:username'],
+        Pool: userPool
+      });
+      cognitoUser.signOut();
+      response.status(200).json({ message: 'Sign out successful.' });
     } else {
       response.status(401).json({ message: 'Tokens are invalid.' });
     }
