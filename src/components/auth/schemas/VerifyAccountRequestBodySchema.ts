@@ -1,7 +1,7 @@
 // EXTERNAL IMPORTS
 import Joi from 'joi';
 
-export const SignInRequestSchema = Joi.object().keys({
+export const VerifyAccountRequestBodySchema = Joi.object().keys({
   username: Joi.string().alphanum().min(3).max(30).empty().required().messages({
     'string.alphanum': '`username` must be alpanumeric.',
     'string.min': '`username` length must be 3 or greater.',
@@ -9,7 +9,8 @@ export const SignInRequestSchema = Joi.object().keys({
     'string.empty': '`username` cannot be empty.',
     'any.required': '`username` is required.'
   }),
-  password: Joi.string().required().messages({
-    'any.required': '`password` is required.'
+  confirmation_code: Joi.string().empty().required().messages({
+    'string.empty': '`confirmation_code` cannot be empty.',
+    'any.required': "`confirmation_code` is required."
   })
 });
