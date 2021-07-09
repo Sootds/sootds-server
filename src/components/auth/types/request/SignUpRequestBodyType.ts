@@ -1,4 +1,4 @@
-export type SignUpRequestType = {
+export type SignUpRequestBodyType = {
   username: string;
   name: string;
   email: string;

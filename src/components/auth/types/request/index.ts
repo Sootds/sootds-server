@@ -1,3 +1,3 @@
-export * from './SignUpRequestType';
-export * from './VerifyAccountRequestType';
-export * from './SignInRequestType';
+export * from './SignUpRequestBodyType';
+export * from './VerifyAccountRequestBodyType';
+export * from './SignInRequestBodyType';

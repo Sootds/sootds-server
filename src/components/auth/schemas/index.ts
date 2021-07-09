@@ -1,3 +1,3 @@
-export * from './SignUpRequestSchema';
-export * from './VerifyAccountRequestSchema';
-export * from './SignInRequestSchema';
+export * from './SignUpRequestBodySchema';
+export * from './VerifyAccountRequestBodySchema';
+export * from './SignInRequestBodySchema';

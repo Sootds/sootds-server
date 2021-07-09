@@ -1,7 +1,7 @@
 // EXTERNAL IMPORTS
 import Joi from 'joi';
 
-export const SignUpRequestSchema = Joi.object().keys({
+export const SignUpRequestBodySchema = Joi.object().keys({
   username: Joi.string().alphanum().min(3).max(30).empty().required().messages({
     'string.alphanum': '`username` must be alpanumeric.',
     'string.min': '`username` length must be 3 or greater.',
