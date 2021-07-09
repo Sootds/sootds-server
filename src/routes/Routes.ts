@@ -1,5 +1,8 @@
+// EXTERNAL IMPORTS
 import { Router } from 'express';
-import { authRoute, authRouter } from '../components/auth';
+
+// LOCAL IMPORTS
+import { authRoute, authRouter } from '../components/Auth';
 
 export const apiRoute = '/api';
 export const apiRouter = Router();
