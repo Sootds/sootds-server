@@ -5,17 +5,33 @@ import {
   CognitoUserAttribute,
   CognitoUser,
   CognitoUserSession,
+  CognitoIdToken,
+  CognitoAccessToken,
+  CognitoRefreshToken,
   AuthenticationDetails,
   ISignUpResult
 } from 'amazon-cognito-identity-js';
 import AWS from 'aws-sdk/global';
+import jwtDecode from 'jwt-decode';
 
 // SHARED IMPORTS
 import { validateRequestSchema } from '../../shared/middlewares';
 
 // LOCAL IMPORTS
-import { SignUpRequestType, VerifyAccountRequestType, SignInRequestType } from './types';
-import { SignUpRequestSchema, VerifyAccountRequestSchema, SignInRequestSchema } from './schemas';
+import {
+  SignUpRequestBodyType,
+  VerifyAccountRequestBodyType,
+  SignInRequestBodyType,
+  RefreshTokenRequestBodyType,
+  RefreshTokenRequestCookieType,
+  IdTokenDecodedType
+} from './types';
+import {
+  SignUpRequestBodySchema,
+  VerifyAccountRequestBodySchema,
+  SignInRequestBodySchema,
+  RefreshTokenRequestBodySchema
+} from './schemas';
 
 // Setup component router.
 export const authRoute = '/auth';
@@ -38,9 +54,9 @@ authRouter.get('/ping', (_: Request, response: Response): void => {
 // Sign Up
 authRouter.post(
   '/signup',
-  validateRequestSchema(SignUpRequestSchema),
+  validateRequestSchema(SignUpRequestBodySchema),
   (request: Request, response: Response): void => {
-    const user: SignUpRequestType = request.body;
+    const user: SignUpRequestBodyType = request.body;
 
     const attributeList = [
       new CognitoUserAttribute({
@@ -82,9 +98,9 @@ authRouter.post(
 // Verify Account
 authRouter.post(
   '/verify-account',
-  validateRequestSchema(VerifyAccountRequestSchema),
+  validateRequestSchema(VerifyAccountRequestBodySchema),
   (request: Request, response: Response): void => {
-    const user: VerifyAccountRequestType = request.body;
+    const user: VerifyAccountRequestBodyType = request.body;
 
     const cognitoUser = new CognitoUser({
       Username: user.username,
@@ -120,9 +136,9 @@ authRouter.post(
 // Sign In
 authRouter.post(
   '/signin',
-  validateRequestSchema(SignInRequestSchema),
+  validateRequestSchema(SignInRequestBodySchema),
   (request: Request, response: Response): void => {
-    const user: SignInRequestType = request.body;
+    const user: SignInRequestBodyType = request.body;
 
     const cognitoUser = new CognitoUser({
       Username: user.username,
@@ -157,5 +173,28 @@ authRouter.post(
         }
       }
     });
+  }
+);
+
+// Refresh Token
+authRouter.post(
+  '/refresh-token',
+  validateRequestSchema(RefreshTokenRequestBodySchema),
+  (request: Request, response: Response): void => {
+    const tokens: RefreshTokenRequestBodyType = request.body;
+    const cookies: RefreshTokenRequestCookieType = request.cookies;
+
+    const session = new CognitoUserSession({
+      IdToken: new CognitoIdToken({ IdToken: tokens.id_token }),
+      AccessToken: new CognitoAccessToken({ AccessToken: tokens.access_token }),
+      RefreshToken: new CognitoRefreshToken({ RefreshToken: cookies.refresh_token })
+    });
+
+    // TO DO: Implement proper token validation and refresh.
+    if (session.isValid()) {
+      response.status(200).json({ message: 'Tokens are valid.' });
+    } else {
+      response.status(401).json({ message: 'Tokens are invalid.' });
+    }
   }
 );
