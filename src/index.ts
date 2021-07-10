@@ -8,7 +8,7 @@ import { apiRoute, apiRouter } from './routes';
 
 // Create Express server.
 const server = express();
-const port = 4000;
+const port = process.env.PORT || 4000;
 
 // Setup middleware.
 server.use(cors({ origin: true, credentials: true }));
