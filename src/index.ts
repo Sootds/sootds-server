@@ -1,5 +1,5 @@
 // EXTERNAL IMPORTS
-import express from 'express';
+import express, { RequestHandler } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
@@ -8,17 +8,19 @@ import { apiRoute, apiRouter } from './routes';
 
 // Create Express server.
 const server = express();
-const port = 4000;
+const port = process.env.PORT || 4000;
 
 // Setup middleware.
 server.use(cors({ origin: true, credentials: true }));
-server.use(express.urlencoded({ extended: true }));
-server.use(express.json());
+server.use(express.urlencoded({ extended: true }) as RequestHandler);
+server.use(express.json() as RequestHandler);
 server.use(cookieParser());
 
 // Setup API router.
 server.use(apiRoute, apiRouter);
 
 server.listen(port, (): void => {
-  console.log(`Server listening at http://localhost:${port}`);
+  if (process.env.NODE_ENV == 'development') {
+    console.log(`Server listening at http://localhost:${port}`);
+  }
 });
