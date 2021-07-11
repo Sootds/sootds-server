@@ -2,7 +2,7 @@
 import { Router } from 'express';
 
 // LOCAL IMPORTS
-import { authRoute, authRouter } from '../components/test';
+import { authRoute, authRouter } from '../components/Auth';
 
 export const apiRoute = '/api';
 export const apiRouter = Router();
