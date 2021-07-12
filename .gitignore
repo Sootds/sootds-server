@@ -10,4 +10,4 @@ certs/**/*
 *.orig.*
 
 .env*
-
+dist/
