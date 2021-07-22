@@ -9,6 +9,7 @@ import {
   CognitoAccessToken,
   CognitoRefreshToken,
   AuthenticationDetails,
+  CodeDeliveryDetails,
   ISignUpResult
 } from 'amazon-cognito-identity-js';
 import AWS from 'aws-sdk/global';
@@ -18,23 +19,8 @@ import jwtDecode from 'jwt-decode';
 import { validateRequestSchema } from '../../shared/middlewares';
 
 // LOCAL IMPORTS
-import {
-  SignUpRequestBodyType,
-  VerifyAccountRequestBodyType,
-  SignInRequestBodyType,
-  RefreshTokenRequestBodyType,
-  RefreshTokenRequestCookieType,
-  IdTokenDecodedType,
-  SignOutRequestBodyType,
-  SignOutRequestCookieType
-} from './types';
-import {
-  SignUpRequestBodySchema,
-  VerifyAccountRequestBodySchema,
-  SignInRequestBodySchema,
-  RefreshTokenRequestBodySchema,
-  SignOutRequestBodySchema
-} from './schemas';
+import * as types from './types';
+import * as schemas from './schemas';
 
 // Setup component router.
 export const authRoute = '/auth';
@@ -57,9 +43,9 @@ authRouter.get('/ping', (_: Request, response: Response): void => {
 // Sign Up
 authRouter.post(
   '/signup',
-  validateRequestSchema(SignUpRequestBodySchema),
+  validateRequestSchema(schemas.SignUpRequestBodySchema),
   (request: Request, response: Response): void => {
-    const user: SignUpRequestBodyType = request.body;
+    const user: types.SignUpRequestBodyType = request.body;
 
     const attributeList = [
       new CognitoUserAttribute({
@@ -101,9 +87,9 @@ authRouter.post(
 // Verify Account
 authRouter.post(
   '/verify-account',
-  validateRequestSchema(VerifyAccountRequestBodySchema),
+  validateRequestSchema(schemas.VerifyAccountRequestBodySchema),
   (request: Request, response: Response): void => {
-    const user: VerifyAccountRequestBodyType = request.body;
+    const user: types.VerifyAccountRequestBodyType = request.body;
 
     const cognitoUser = new CognitoUser({
       Username: user.username,
@@ -139,9 +125,9 @@ authRouter.post(
 // Sign In
 authRouter.post(
   '/signin',
-  validateRequestSchema(SignInRequestBodySchema),
+  validateRequestSchema(schemas.SignInRequestBodySchema),
   (request: Request, response: Response): void => {
-    const user: SignInRequestBodyType = request.body;
+    const user: types.SignInRequestBodyType = request.body;
 
     const cognitoUser = new CognitoUser({
       Username: user.username,
@@ -179,13 +165,80 @@ authRouter.post(
   }
 );
 
+// Forgot Password
+authRouter.post(
+  '/forgot-password',
+  validateRequestSchema(schemas.ForgotPasswordRequestBodySchema),
+  (request: Request, response: Response): void => {
+    const user: types.ForgotPasswordRequestBodyType = request.body;
+
+    const cognitoUser = new CognitoUser({
+      Username: user.username,
+      Pool: userPool
+    });
+
+    cognitoUser.forgotPassword({
+      onSuccess: (data: { CodeDeliveryDetails: CodeDeliveryDetails }): void => {
+        response.status(200).json({
+          message: `A verification code to reset your password has been sent your email: ${data.CodeDeliveryDetails.Destination}`
+        });
+      },
+      onFailure: (error: Error): void => {
+        switch (error.name) {
+          case 'LimitExceededException':
+            response.status(500).json({ message: 'Uh-oh. Server error.' });
+            break;
+          default:
+            response.status(400).json({ message: 'Username provided does not exist.' });
+            break;
+        }
+      }
+    });
+  }
+);
+
+// Confirm New Password
+authRouter.post(
+  '/confirm-new-password',
+  validateRequestSchema(schemas.ConfirmNewPasswordRequestBodySchema),
+  (request: Request, response: Response): void => {
+    const user: types.ConfirmNewPasswordRequestBodyType = request.body;
+
+    const cognitoUser = new CognitoUser({
+      Username: user.username,
+      Pool: userPool
+    });
+
+    cognitoUser.confirmPassword(user.verification_code, user.new_password, {
+      onSuccess: (): void => {
+        response.status(200).json({
+          message: 'Password updated.'
+        });
+      },
+      onFailure: (error: Error): void => {
+        switch (error.name) {
+          case 'CodeMismatchException':
+            response.status(401).json({ message: 'Invalid verification code.' });
+            break;
+          case 'ExpiredCodeException':
+            response.status(400).json({ message: 'Verification code expired.' });
+            break;
+          default:
+            response.status(500).json({ message: 'Uh-oh. Server error.' });
+            break;
+        }
+      }
+    });
+  }
+);
+
 // Refresh Token
 authRouter.post(
   '/refresh-token',
-  validateRequestSchema(RefreshTokenRequestBodySchema),
+  validateRequestSchema(schemas.RefreshTokenRequestBodySchema),
   (request: Request, response: Response): void => {
-    const tokens: RefreshTokenRequestBodyType = request.body;
-    const cookies: RefreshTokenRequestCookieType = request.cookies;
+    const tokens: types.RefreshTokenRequestBodyType = request.body;
+    const cookies: types.RefreshTokenRequestCookieType = request.cookies;
 
     const session = new CognitoUserSession({
       IdToken: new CognitoIdToken({ IdToken: tokens.id_token }),
@@ -205,10 +258,10 @@ authRouter.post(
 // Sign Out
 authRouter.post(
   '/signout',
-  validateRequestSchema(SignOutRequestBodySchema),
+  validateRequestSchema(schemas.SignOutRequestBodySchema),
   (request: Request, response: Response): void => {
-    const tokens: SignOutRequestBodyType = request.body;
-    const cookies: SignOutRequestCookieType = request.cookies;
+    const tokens: types.SignOutRequestBodyType = request.body;
+    const cookies: types.SignOutRequestCookieType = request.cookies;
 
     const session = new CognitoUserSession({
       IdToken: new CognitoIdToken({ IdToken: tokens.id_token }),
@@ -218,7 +271,7 @@ authRouter.post(
 
     // TO DO: Track the issue regarding `.signOut()` not revoking tokens.
     if (session.isValid()) {
-      const idTokenDecodedType: IdTokenDecodedType = jwtDecode(tokens.id_token);
+      const idTokenDecodedType: types.IdTokenDecodedType = jwtDecode(tokens.id_token);
       const cognitoUser = new CognitoUser({
         Username: idTokenDecodedType['cognito:username'],
         Pool: userPool
