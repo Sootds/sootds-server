@@ -9,8 +9,8 @@ export const VerifyAccountRequestBodySchema = Joi.object().keys({
     'string.empty': '`username` cannot be empty.',
     'any.required': '`username` is required.'
   }),
-  confirmation_code: Joi.string().empty().required().messages({
-    'string.empty': '`confirmation_code` cannot be empty.',
-    'any.required': "`confirmation_code` is required."
+  verification_code: Joi.string().empty().required().messages({
+    'string.empty': '`verification_code` cannot be empty.',
+    'any.required': "`verification_code` is required."
   })
 });

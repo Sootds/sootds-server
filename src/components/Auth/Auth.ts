@@ -97,7 +97,7 @@ authRouter.post(
     });
 
     cognitoUser.confirmRegistration(
-      user.confirmation_code,
+      user.verification_code,
       true,
       (error: Error, _: ISignUpResult): void => {
         if (error != null) {

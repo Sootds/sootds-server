@@ -1,4 +1,4 @@
 export type VerifyAccountRequestBodyType = {
   username: string;
-  confirmation_code: string;
+  verification_code: string;
 };
