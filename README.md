@@ -53,27 +53,29 @@ This README will guide you how to clone this repo and have it running locally on
 
 ### Cloning the repo
 
-1. Type the following command in your terminal:
+1. Create a personal access token by following this [guide](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token). Give yourself as much access as you can and save the generated token.
+
+2. Make sure that you've deleted any previous folders named `sootds-server` in the current directory and type the following command in your terminal:
 
     - `git clone https://username:password@github.com/Sootds/sootds-server.git`
     - `username` is your GitHub username
-    - `password` is your GitHub password
+    - `password` is your personal access token generated from step 1
 
-2. This clones the repo locally on your machine. Type the following command in your terminal to navigate in to it:
+3. This clones the repo locally on your machine. Type the following command in your terminal to navigate in to it:
 
     - `cd sootds-server`
 
-3. Once you're in the directory, set your GitHub name and email by typing the following commands in your terminal:
+4. Once you're in the directory, set your GitHub name and email by typing the following commands in your terminal:
 
     - `git config user.name "firstName lastName"`
     - `git config user.email "firstName.lastName@sootds.com"`
 
-4. Verify that you've set your GitHub name and email in this directory by typing the following commands in your terminal:
+5. Verify that you've set your GitHub name and email in this directory by typing the following commands in your terminal:
 
     - `git config user.name`
     - `git config user.email`
 
-5. Once you've done these steps, you've successfully cloned this repo!
+6. Once you've done these steps, you've successfully cloned this repo!
 
 ### Running the client locally
 
