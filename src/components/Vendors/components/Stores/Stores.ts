@@ -17,14 +17,15 @@ storesRouter.get('/ping', (_: Request, response: Response): void => {
 storesRouter.get('/:store_id', (request: Request, response: Response): void => {
   response
     .status(200)
-    .json({ message: `Store ID: ${request.params.store_id}`, timestamp: Date.now() });
+    .json({
+      message: `Successfully retrieved store ${request.params.store_id}.`,
+      timestamp: Date.now()
+    });
 });
 
 // Create New Store
 storesRouter.post('/', (request: Request, response: Response): void => {
-  response
-    .status(200)
-    .json({ message: `New store created.`, timestamp: Date.now() });
+  response.status(200).json({ message: `New store created.`, timestamp: Date.now() });
 });
 
 // Update Store
