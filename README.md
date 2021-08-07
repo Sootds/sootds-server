@@ -1,6 +1,6 @@
 # Sootds Server
 
-## What' this repo for?
+## What's this repo for?
 
 This repo is the back-end server of Sootds' platform where user actions and transactions of buying, selling and renting clothes from other users (registered vendors) will be processed, verified and logged.
 
