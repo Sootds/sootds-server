@@ -16,7 +16,7 @@ import AWS from 'aws-sdk/global';
 import jwtDecode from 'jwt-decode';
 
 // SHARED IMPORTS
-import { validateRequestSchema } from '../../shared/middlewares';
+import { validateRequestSchema } from '../../shared/middleware';
 
 // LOCAL IMPORTS
 import * as types from './types';
