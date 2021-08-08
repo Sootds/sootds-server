@@ -1,5 +1,6 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  testPathIgnorePatterns: ['<rootDir>/node_modules/']
+  testPathIgnorePatterns: ['<rootDir>/node_modules/'],
+  setupFiles: ['dotenv/config']
 };
