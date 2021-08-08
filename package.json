@@ -7,7 +7,7 @@
     "build": "rimraf dist && tsc",
     "clean": "rimraf dist",
     "dev": "cross-env NODE_ENV=development ts-node-dev -r dotenv/config src",
-    "test": "cross-env NODE_ENV=testing jest --detectOpenHandles",
+    "test": "cross-env NODE_ENV=testing jest --verbose --detectOpenHandles",
     "start": "cross-env NODE_ENV=production node dist/src/index.js"
   },
   "dependencies": {
