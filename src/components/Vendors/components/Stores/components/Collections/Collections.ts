@@ -54,7 +54,7 @@ collectionsRouter.put(
   }
 );
 
-// Delete Store Product By Product ID
+// Delete Store Collection By Collection ID
 collectionsRouter.delete(
   '/:collection_id',
   (request: CollectionsRequest, response: Response): void => {
