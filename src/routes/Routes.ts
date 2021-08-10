@@ -10,7 +10,9 @@ import {
   vendorsRoute,
   vendorsRouter,
   productsRoute,
-  productsRouter
+  productsRouter,
+  collectionsRoute,
+  collectionsRouter
 } from '../components';
 
 // Setup main API router.
@@ -22,3 +24,4 @@ apiRouter.use(authRoute, authRouter);
 apiRouter.use(usersRoute, usersRouter);
 apiRouter.use(vendorsRoute, vendorsRouter);
 apiRouter.use(productsRoute, productsRouter);
+apiRouter.use(collectionsRoute, collectionsRouter);
