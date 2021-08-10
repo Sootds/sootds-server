@@ -19,6 +19,7 @@ import jwtDecode from 'jwt-decode';
 import { validateRequestSchema } from '../../shared/middleware';
 
 // LOCAL IMPORTS
+import * as interfaces from './interfaces';
 import * as types from './types';
 import * as schemas from './schemas';
 
@@ -37,24 +38,22 @@ const userPool = new CognitoUserPool({
 
 // Ping
 authRouter.get('/ping', (_: Request, response: Response): void => {
-  response.status(200).json({ message: 'pong' });
+  response.status(200).json({ message: 'pong', timestamp: Date.now() });
 });
 
 // Sign Up
 authRouter.post(
   '/signup',
   validateRequestSchema(schemas.SignUpRequestBodySchema),
-  (request: Request, response: Response): void => {
-    const user: types.SignUpRequestBodyType = request.body;
-
+  (request: interfaces.SignUpRequest, response: Response): void => {
     const attributeList = [
       new CognitoUserAttribute({
         Name: 'name',
-        Value: user.name
+        Value: request.body.name
       }),
       new CognitoUserAttribute({
         Name: 'email',
-        Value: user.email
+        Value: request.body.email
       }),
       new CognitoUserAttribute({
         Name: 'updated_at',
@@ -63,21 +62,23 @@ authRouter.post(
     ];
 
     userPool.signUp(
-      user.username,
-      user.password,
+      request.body.username,
+      request.body.password,
       attributeList,
       null,
       (error: Error, _: ISignUpResult): void => {
         if (error != null) {
           switch (error.name) {
             case 'UsernameExistsException':
-              response.status(409).json({ message: 'Account already exists.' });
+              response
+                .status(409)
+                .json({ message: 'Account already exists.', timestamp: Date.now() });
               break;
             default:
               break;
           }
         } else {
-          response.status(200).json({ message: 'Account created.' });
+          response.status(200).json({ message: 'Account created.', timestamp: Date.now() });
         }
       }
     );
@@ -88,34 +89,38 @@ authRouter.post(
 authRouter.post(
   '/verify-account',
   validateRequestSchema(schemas.VerifyAccountRequestBodySchema),
-  (request: Request, response: Response): void => {
-    const user: types.VerifyAccountRequestBodyType = request.body;
-
+  (request: interfaces.VerifyAccountRequest, response: Response): void => {
     const cognitoUser = new CognitoUser({
-      Username: user.username,
+      Username: request.body.username,
       Pool: userPool
     });
 
     cognitoUser.confirmRegistration(
-      user.verification_code,
+      request.body.verification_code,
       true,
       (error: Error, _: ISignUpResult): void => {
         if (error != null) {
           switch (error.name) {
             case 'ExpiredCodeException':
-              response.status(410).json({ message: 'Confirmation code has expired.' });
+              response
+                .status(410)
+                .json({ message: 'Confirmation code has expired.', timestamp: Date.now() });
               break;
             case 'CodeMismatchException':
-              response.status(400).json({ message: 'Confirmation code is invalid.' });
+              response
+                .status(400)
+                .json({ message: 'Confirmation code is invalid.', timestamp: Date.now() });
               break;
             case 'NotAuthorizedException':
-              response.status(401).json({ message: 'Account is not authorized.' });
+              response
+                .status(401)
+                .json({ message: 'Account is not authorized.', timestamp: Date.now() });
               break;
             default:
               break;
           }
         } else {
-          response.status(200).json({ message: 'Account verified.' });
+          response.status(200).json({ message: 'Account verified.', timestamp: Date.now() });
         }
       }
     );
@@ -126,17 +131,15 @@ authRouter.post(
 authRouter.post(
   '/signin',
   validateRequestSchema(schemas.SignInRequestBodySchema),
-  (request: Request, response: Response): void => {
-    const user: types.SignInRequestBodyType = request.body;
-
+  (request: interfaces.SignInRequest, response: Response): void => {
     const cognitoUser = new CognitoUser({
-      Username: user.username,
+      Username: request.body.username,
       Pool: userPool
     });
 
     const authenticationDetails = new AuthenticationDetails({
-      Username: user.username,
-      Password: user.password
+      Username: request.body.username,
+      Password: request.body.password
     });
 
     cognitoUser.authenticateUser(authenticationDetails, {
@@ -148,16 +151,19 @@ authRouter.post(
         response.status(200).json({
           message: 'Sign in successful.',
           id_token: session.getIdToken().getJwtToken(),
-          access_token: session.getAccessToken().getJwtToken()
+          access_token: session.getAccessToken().getJwtToken(),
+          timestamp: Date.now()
         });
       },
       onFailure: (error: Error): void => {
         switch (error.name) {
           case 'NotAuthorizedException':
-            response.status(401).json({ message: 'Incorrect username or password.' });
+            response
+              .status(401)
+              .json({ message: 'Incorrect username or password.', timestamp: Date.now() });
             break;
           default:
-            response.status(500).json({ message: 'Uh-oh. Server error.' });
+            response.status(500).json({ message: 'Uh-oh. Server error.', timestamp: Date.now() });
             break;
         }
       }
@@ -169,27 +175,28 @@ authRouter.post(
 authRouter.post(
   '/forgot-password',
   validateRequestSchema(schemas.ForgotPasswordRequestBodySchema),
-  (request: Request, response: Response): void => {
-    const user: types.ForgotPasswordRequestBodyType = request.body;
-
+  (request: interfaces.ForgotPasswordRequest, response: Response): void => {
     const cognitoUser = new CognitoUser({
-      Username: user.username,
+      Username: request.body.username,
       Pool: userPool
     });
 
     cognitoUser.forgotPassword({
       onSuccess: (data: { CodeDeliveryDetails: CodeDeliveryDetails }): void => {
         response.status(200).json({
-          message: `A verification code to reset your password has been sent your email: ${data.CodeDeliveryDetails.Destination}`
+          message: `A verification code to reset your password has been sent your email: ${data.CodeDeliveryDetails.Destination}`,
+          timestamp: Date.now()
         });
       },
       onFailure: (error: Error): void => {
         switch (error.name) {
           case 'LimitExceededException':
-            response.status(500).json({ message: 'Uh-oh. Server error.' });
+            response.status(500).json({ message: 'Uh-oh. Server error.', timestamp: Date.now() });
             break;
           default:
-            response.status(400).json({ message: 'Username provided does not exist.' });
+            response
+              .status(400)
+              .json({ message: 'Username provided does not exist.', timestamp: Date.now() });
             break;
         }
       }
@@ -201,30 +208,33 @@ authRouter.post(
 authRouter.post(
   '/confirm-new-password',
   validateRequestSchema(schemas.ConfirmNewPasswordRequestBodySchema),
-  (request: Request, response: Response): void => {
-    const user: types.ConfirmNewPasswordRequestBodyType = request.body;
-
+  (request: interfaces.ConfirmNewPasswordRequest, response: Response): void => {
     const cognitoUser = new CognitoUser({
-      Username: user.username,
+      Username: request.body.username,
       Pool: userPool
     });
 
-    cognitoUser.confirmPassword(user.verification_code, user.new_password, {
+    cognitoUser.confirmPassword(request.body.verification_code, request.body.new_password, {
       onSuccess: (): void => {
         response.status(200).json({
-          message: 'Password updated.'
+          message: 'Password updated.',
+          timestamp: Date.now()
         });
       },
       onFailure: (error: Error): void => {
         switch (error.name) {
           case 'CodeMismatchException':
-            response.status(401).json({ message: 'Invalid verification code.' });
+            response
+              .status(401)
+              .json({ message: 'Invalid verification code.', timestamp: Date.now() });
             break;
           case 'ExpiredCodeException':
-            response.status(400).json({ message: 'Verification code expired.' });
+            response
+              .status(400)
+              .json({ message: 'Verification code expired.', timestamp: Date.now() });
             break;
           default:
-            response.status(500).json({ message: 'Uh-oh. Server error.' });
+            response.status(500).json({ message: 'Uh-oh. Server error.', timestamp: Date.now() });
             break;
         }
       }
@@ -236,21 +246,18 @@ authRouter.post(
 authRouter.post(
   '/refresh-token',
   validateRequestSchema(schemas.RefreshTokenRequestBodySchema),
-  (request: Request, response: Response): void => {
-    const tokens: types.RefreshTokenRequestBodyType = request.body;
-    const cookies: types.RefreshTokenRequestCookieType = request.cookies;
-
+  (request: interfaces.RefreshTokenRequest, response: Response): void => {
     const session = new CognitoUserSession({
-      IdToken: new CognitoIdToken({ IdToken: tokens.id_token }),
-      AccessToken: new CognitoAccessToken({ AccessToken: tokens.access_token }),
-      RefreshToken: new CognitoRefreshToken({ RefreshToken: cookies.refresh_token })
+      IdToken: new CognitoIdToken({ IdToken: request.body.id_token }),
+      AccessToken: new CognitoAccessToken({ AccessToken: request.body.access_token }),
+      RefreshToken: new CognitoRefreshToken({ RefreshToken: request.cookies.refresh_token })
     });
 
     // TO DO: Implement proper token validation and refresh.
     if (session.isValid()) {
-      response.status(200).json({ message: 'Tokens are valid.' });
+      response.status(200).json({ message: 'Tokens are valid.', timestamp: Date.now() });
     } else {
-      response.status(401).json({ message: 'Tokens are invalid.' });
+      response.status(401).json({ message: 'Tokens are invalid.', timestamp: Date.now() });
     }
   }
 );
@@ -259,27 +266,24 @@ authRouter.post(
 authRouter.post(
   '/signout',
   validateRequestSchema(schemas.SignOutRequestBodySchema),
-  (request: Request, response: Response): void => {
-    const tokens: types.SignOutRequestBodyType = request.body;
-    const cookies: types.SignOutRequestCookieType = request.cookies;
-
+  (request: interfaces.SignOutRequest, response: Response): void => {
     const session = new CognitoUserSession({
-      IdToken: new CognitoIdToken({ IdToken: tokens.id_token }),
-      AccessToken: new CognitoAccessToken({ AccessToken: tokens.access_token }),
-      RefreshToken: new CognitoRefreshToken({ RefreshToken: cookies.refresh_token })
+      IdToken: new CognitoIdToken({ IdToken: request.body.id_token }),
+      AccessToken: new CognitoAccessToken({ AccessToken: request.body.access_token }),
+      RefreshToken: new CognitoRefreshToken({ RefreshToken: request.cookies.refresh_token })
     });
 
     // TO DO: Track the issue regarding `.signOut()` not revoking tokens.
     if (session.isValid()) {
-      const idTokenDecodedType: types.IdTokenDecodedType = jwtDecode(tokens.id_token);
+      const idTokenDecodedType: types.IdTokenDecodedType = jwtDecode(request.body.id_token);
       const cognitoUser = new CognitoUser({
         Username: idTokenDecodedType['cognito:username'],
         Pool: userPool
       });
       cognitoUser.signOut();
-      response.status(200).json({ message: 'Sign out successful.' });
+      response.status(200).json({ message: 'Sign out successful.', timestamp: Date.now() });
     } else {
-      response.status(401).json({ message: 'Tokens are invalid.' });
+      response.status(401).json({ message: 'Tokens are invalid.', timestamp: Date.now() });
     }
   }
 );
