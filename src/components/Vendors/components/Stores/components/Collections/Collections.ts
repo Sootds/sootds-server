@@ -11,7 +11,7 @@ export const collectionsRouter = Router({ mergeParams: true });
 // Ping
 collectionsRouter.get('/ping', (request: CollectionsRequest, response: Response): void => {
   response.status(200).json({
-    message: request.params.store_id,
+    message: `pong from store ${request.params.store_id}.`,
     timestamp: Date.now()
   });
 });

@@ -11,7 +11,7 @@ export const productsRouter = Router({ mergeParams: true });
 // Ping
 productsRouter.get('/ping', (request: ProductsRequest, response: Response): void => {
   response.status(200).json({
-    message: request.params.store_id,
+    message: `pong from store ${request.params.store_id}.`,
     timestamp: Date.now()
   });
 });

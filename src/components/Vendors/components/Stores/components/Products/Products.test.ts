@@ -9,9 +9,11 @@ describe('/api/vendors/stores/:store_id/products', (): void => {
   const productId = 'testing_product_id';
 
   describe('GET /ping', (): void => {
+    const message = `pong from store ${storeId}.`
     it(`should return a status code of '200'`, async (): Promise<void> => {
       const response = await request(server).get(`/api/vendors/stores/${storeId}/products/ping`);
       expect(response.statusCode).toEqual(200);
+      expect(response.body.message).toEqual(message);
     });
   });
 
