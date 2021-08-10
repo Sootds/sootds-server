@@ -6,8 +6,7 @@ import { server } from '../../server';
 
 describe('/api/users/', (): void => {
   describe('GET /ping', (): void => {
-    const statusCode = 200;
-    it(`should return a status code of '${statusCode}'`, async (): Promise<void> => {
+    it(`should return a status code of '200'`, async (): Promise<void> => {
       const response = await request(server).get('/api/users/ping');
       expect(response.statusCode).toEqual(200);
     });
