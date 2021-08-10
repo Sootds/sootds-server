@@ -2,7 +2,7 @@
 import { Router, Request, Response } from 'express';
 
 // LOCAL IMPORTS
-import { productsRoute, productsRouter } from './components';
+import { productsRoute, productsRouter, collectionsRoute, collectionsRouter } from './components';
 
 // SHARED IMPORTS
 import { validateRequestSchema } from '../../../../shared/middleware';
@@ -13,6 +13,7 @@ export const storesRouter = Router();
 
 // Hook up components.
 storesRouter.use(productsRoute, productsRouter);
+storesRouter.use(collectionsRoute, collectionsRouter);
 
 // Ping
 storesRouter.get('/ping', (_: Request, response: Response): void => {
