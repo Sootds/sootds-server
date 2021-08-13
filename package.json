@@ -24,6 +24,7 @@
     "jsonwebtoken": "^8.5.1",
     "jwk-to-pem": "^2.0.5",
     "jwt-decode": "^3.1.2",
+    "pg": "^8.7.1",
     "supertest": "^6.1.4"
   },
   "devDependencies": {
