@@ -23,7 +23,7 @@ export const signInQuery = async (username: string): Promise<void> => {
     // Increment `count` in `sign_in_count` table.
     await dbClient.query(
       `
-      UPDATE sign_in_count
+      UPDATE sign_in_counter
       SET count = count + 1, updated_at = CURRENT_TIMESTAMP
       WHERE user_id = ($1)
       `,
