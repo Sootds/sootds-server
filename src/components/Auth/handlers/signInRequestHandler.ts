@@ -23,17 +23,27 @@ export const signInRequestHandler = (request: SignInRequest, response: Response)
   cognitoUser.authenticateUser(authenticationDetails, {
     onSuccess: async (session: CognitoUserSession): Promise<void> => {
       try {
-        await signInQuery(request.body.username);
+        const isFirstSignIn = await signInQuery(request.body.username);
         response.cookie('refresh_token', session.getRefreshToken().getToken(), {
           httpOnly: true,
           secure: false
         });
-        response.status(200).json({
-          message: 'Sign in successful.',
-          id_token: session.getIdToken().getJwtToken(),
-          access_token: session.getAccessToken().getJwtToken(),
-          timestamp: Date.now()
-        });
+        response.status(200).json(
+          isFirstSignIn
+            ? {
+                message: 'Sign in successful.',
+                id_token: session.getIdToken().getJwtToken(),
+                access_token: session.getAccessToken().getJwtToken(),
+                first_sign_in: isFirstSignIn,
+                timestamp: Date.now()
+              }
+            : {
+                message: 'Sign in successful.',
+                id_token: session.getIdToken().getJwtToken(),
+                access_token: session.getAccessToken().getJwtToken(),
+                timestamp: Date.now()
+              }
+        );
       } catch (error: any) {
         response.status(500).json({
           message: 'Something happened with the database.',
