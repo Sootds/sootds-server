@@ -18,7 +18,7 @@ export const signUpQuery = async (
     // Insert new user to `users` table.
     result = await dbClient.query(
       `
-      INSERT INTO users(username, email, name)
+      INSERT INTO users (username, email, name)
       VALUES ($1, $2, $3)
       RETURNING id
       `,
@@ -28,7 +28,7 @@ export const signUpQuery = async (
     // Insert entry to `sign_in_counter` table.
     await dbClient.query(
       `
-      INSERT INTO sign_in_counter(user_id) 
+      INSERT INTO sign_in_counter (user_id) 
       VALUES ($1)
       `,
       [result.rows[0].id]
