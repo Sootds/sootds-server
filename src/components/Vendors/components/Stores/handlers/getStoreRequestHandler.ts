@@ -7,13 +7,7 @@ import { ResponseError } from '../../../../../shared/utils';
 // LOCAL IMPORTS
 import * as localQueries from '../queries';
 import { GetStoreRequest } from '../interfaces';
-
-// Types
-type StoreType = {
-  id: number;
-  urlName: string;
-  name: string;
-};
+import { StoreType } from '../types';
 
 export const getStoreRequestHandler = async (
   request: GetStoreRequest,

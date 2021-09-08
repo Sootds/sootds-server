@@ -4,12 +4,8 @@ import { QueryResult } from 'pg';
 // SHARED IMPORTS
 import { DBPool } from '../../../../../shared/singletons';
 
-// Types
-type StoreType = {
-  id: number;
-  urlName: string;
-  name: string;
-};
+// LOCAL IMPORTS
+import { StoreType } from '../types';
 
 export const getStoreByStoreUrlNameQuery = async (urlName: string): Promise<StoreType> => {
   const dbClient = await DBPool.connect();
