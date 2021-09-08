@@ -1,11 +1,14 @@
 // EXTERNAL IMPORTS
 import { Router, Request, Response } from 'express';
 
+// SHARED IMPORTS
+import { validateRequestSchema, verifyAccessToken } from '../../../../shared/middleware';
+
 // LOCAL IMPORTS
 import { productsRoute, productsRouter, collectionsRoute, collectionsRouter } from './components';
-
-// SHARED IMPORTS
-import { validateRequestSchema } from '../../../../shared/middleware';
+import * as interfaces from './interfaces';
+import { CreateStoreRequestBodySchema } from './schemas';
+import * as handlers from './handlers';
 
 // Setup component router.
 export const storesRoute = '/stores';
@@ -20,18 +23,19 @@ storesRouter.get('/ping', (_: Request, response: Response): void => {
   response.status(200).json({ message: 'pong', timestamp: Date.now() });
 });
 
-// Get Store By ID
-storesRouter.get('/:store_id', (request: Request, response: Response): void => {
-  response.status(200).json({
-    message: `Successfully retrieved store ${request.params.store_id}.`,
-    timestamp: Date.now()
-  });
+// Get Store By ID or URL Name
+storesRouter.get('/', (request: interfaces.GetStoreRequest, response: Response): void => {
+  handlers.getStoreRequestHandler(request, response);
 });
 
-// Create New Store
-storesRouter.post('/', (request: Request, response: Response): void => {
-  response.status(200).json({ message: `New store created.`, timestamp: Date.now() });
-});
+// Create Store
+storesRouter.post(
+  '/',
+  [verifyAccessToken, validateRequestSchema(CreateStoreRequestBodySchema)],
+  async (request: interfaces.CreateStoreRequest, response: Response): Promise<void> => {
+    handlers.createStoreRequestHandler(request, response);
+  }
+);
 
 // Update Store
 storesRouter.put('/:store_id', (request: Request, response: Response): void => {
