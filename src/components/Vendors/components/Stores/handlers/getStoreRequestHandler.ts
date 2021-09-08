@@ -12,6 +12,7 @@ import * as localQueries from '../queries';
 type StoreType = {
   id: number;
   urlName: string;
+  name: string;
 };
 
 export const getStoreRequestHandler = async (
@@ -35,7 +36,7 @@ export const getStoreRequestHandler = async (
 
   response.status(200).json({
     message: `Successfully retrieved store.`,
-    store: { id: store.id, url_name: store.urlName },
+    store: { id: store.id, url_name: store.urlName, name: store.name },
     timestamp: Date.now()
   });
 };
