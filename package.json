@@ -7,6 +7,7 @@
     "build": "rimraf dist && tsc",
     "clean": "rimraf dist",
     "dev": "cross-env NODE_ENV=development ts-node-dev -r dotenv/config src",
+    "debug": "cross-env NODE_ENV=development ts-node-dev --inspect --respawn -r dotenv/config src",
     "test": "cross-env NODE_ENV=testing jest --verbose --detectOpenHandles",
     "start": "cross-env NODE_ENV=production node dist/src/index.js"
   },
@@ -24,6 +25,7 @@
     "jsonwebtoken": "^8.5.1",
     "jwk-to-pem": "^2.0.5",
     "jwt-decode": "^3.1.2",
+    "node-fetch": "^2.6.1",
     "pg": "^8.7.1",
     "supertest": "^6.1.4"
   },
@@ -35,6 +37,7 @@
     "@types/jsonwebtoken": "^8.5.2",
     "@types/jwk-to-pem": "^2.0.0",
     "@types/node": "^15.14.2",
+    "@types/node-fetch": "^2.5.12",
     "@types/pg": "^8.6.1",
     "@types/supertest": "^2.0.11",
     "rimraf": "^3.0.2",
