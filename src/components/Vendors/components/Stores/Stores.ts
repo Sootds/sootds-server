@@ -5,10 +5,10 @@ import { Router, Request, Response } from 'express';
 import { validateRequestSchema, verifyAccessToken } from '../../../../shared/middleware';
 
 // LOCAL IMPORTS
-import { productsRoute, productsRouter, collectionsRoute, collectionsRouter } from './components';
 import * as interfaces from './interfaces';
-import { CreateStoreRequestBodySchema } from './schemas';
 import * as handlers from './handlers';
+import { productsRoute, productsRouter, collectionsRoute, collectionsRouter } from './components';
+import { CreateStoreRequestBodySchema } from './schemas';
 
 // Setup component router.
 export const storesRoute = '/stores';

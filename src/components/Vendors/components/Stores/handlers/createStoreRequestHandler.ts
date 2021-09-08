@@ -7,8 +7,8 @@ import * as sharedQueries from '../../../../../shared/queries';
 import { ResponseError } from '../../../../../shared/utils';
 
 // LOCAL IMPORTS
-import { CreateStoreRequest } from '../interfaces';
 import * as localQueries from '../queries';
+import { CreateStoreRequest } from '../interfaces';
 
 export const createStoreRequestHandler = async (
   request: CreateStoreRequest,

@@ -5,8 +5,8 @@ import { Response } from 'express';
 import { ResponseError } from '../../../../../shared/utils';
 
 // LOCAL IMPORTS
-import { GetStoreRequest } from '../interfaces';
 import * as localQueries from '../queries';
+import { GetStoreRequest } from '../interfaces';
 
 // Types
 type StoreType = {
