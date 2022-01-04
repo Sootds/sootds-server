@@ -3,3 +3,4 @@ export * from './Users';
 export * from './Vendors';
 export * from './Products';
 export * from './Collections';
+export * from './Utils';
