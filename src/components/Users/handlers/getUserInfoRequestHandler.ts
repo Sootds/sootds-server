@@ -13,16 +13,16 @@ export const getUserInfoRequestHandler = async (
   response: Response
 ): Promise<void> => {
   try {
-    let user: any | null;
+    let userInfo: any | null;
     try {
-      user = await getUserInfoQuery(request.body.username);
+      userInfo = await getUserInfoQuery(request.body.username);
     } catch (error: any) {
       throw new ResponseError(error.message, 400);
     }
 
     response.status(200).json({
       message: 'Successfully retrieved user info.',
-      user,
+      user_info: userInfo,
       timestamp: Date.now()
     });
   } catch (error: any) {

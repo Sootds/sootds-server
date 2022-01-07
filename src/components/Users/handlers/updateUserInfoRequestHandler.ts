@@ -14,7 +14,7 @@ export const updateUserInfoRequestHandler = async (
 ): Promise<void> => {
   try {
     try {
-      await updateUserInfoQuery(request.body.username, request.body.user);
+      await updateUserInfoQuery(request.body.username, request.body.updated_user_info);
     } catch (error: any) {
       throw new ResponseError(error.message, 400);
     }

@@ -9,7 +9,7 @@ export const UpdateUserInfoRequestBodySchema = Joi.object().keys({
     'string.empty': '`username` cannot be empty.',
     'any.required': '`username` is required.'
   }),
-  user: Joi.object()
+  updated_user_info: Joi.object()
     .keys({
       name: Joi.string().min(3).max(60).empty().required().messages({
         'string.min': '`name` length must be 3 or greater.',

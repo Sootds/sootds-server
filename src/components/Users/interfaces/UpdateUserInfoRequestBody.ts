@@ -8,7 +8,7 @@ interface UpdateUserInfoRequestQuery extends Query {}
 
 interface UpdateUserInfoRequestBody {
   username: string;
-  user: {
+  updated_user_info: {
     name: string;
     birthdate: string;
     address: {

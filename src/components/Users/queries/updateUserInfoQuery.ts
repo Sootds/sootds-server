@@ -15,7 +15,7 @@ type User = {
   };
 };
 
-export const updateUserInfoQuery = async (username: string, user: User): Promise<void> => {
+export const updateUserInfoQuery = async (username: string, updatedUserInfo: User): Promise<void> => {
   const dbClient = await DBPool.connect();
   try {
     dbClient.query(BEGIN)
@@ -25,7 +25,7 @@ export const updateUserInfoQuery = async (username: string, user: User): Promise
       SET name = ($1), birthdate = ($2)
       WHERE username = ($3)
       `,
-      [user.name, user.birthdate, username]
+      [updatedUserInfo.name, updatedUserInfo.birthdate, username]
     );
     await dbClient.query(
       `
@@ -41,11 +41,11 @@ export const updateUserInfoQuery = async (username: string, user: User): Promise
       AND u.username = ($6)
       `,
       [
-        user.address.name,
-        user.address.city,
-        user.address.state,
-        user.address.code,
-        user.address.country_id,
+        updatedUserInfo.address.name,
+        updatedUserInfo.address.city,
+        updatedUserInfo.address.state,
+        updatedUserInfo.address.code,
+        updatedUserInfo.address.country_id,
         username
       ]
     );
