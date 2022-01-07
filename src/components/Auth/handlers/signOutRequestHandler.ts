@@ -31,6 +31,8 @@ export const signOutRequestHandler = (request: RefreshTokenRequest, response: Re
       Pool: UserPool
     });
     cognitoUser.signOut();
+    response.clearCookie('refresh_token');
+    response.clearCookie('access_token');
     response.status(200).json({ message: 'Sign out successful.', timestamp: Date.now() });
   } else {
     response.status(401).json({ message: 'Tokens are invalid.', timestamp: Date.now() });

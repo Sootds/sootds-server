@@ -24,10 +24,17 @@ export const signInRequestHandler = (request: SignInRequest, response: Response)
     onSuccess: async (session: CognitoUserSession): Promise<void> => {
       try {
         const isFirstSignIn = await signInQuery(request.body.username);
+
         response.cookie('refresh_token', session.getRefreshToken().getToken(), {
           httpOnly: true,
           secure: false
         });
+
+        response.cookie('access_token', session.getAccessToken().getJwtToken(), {
+          httpOnly: true,
+          secure: false
+        })
+
         response.status(200).json(
           isFirstSignIn
             ? {
